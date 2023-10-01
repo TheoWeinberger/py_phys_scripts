@@ -7,5 +7,5 @@ General script for plotting Fermi surfaces from the command line using pyvista. 
 ## better_bxsf.py
 Useful for extracting .bxsf files from Wien2k output 
 
-##auto_skeaf.py
+## auto_skeaf.py
 requires ./skeaf to be in the system PATH. Automatically runs skeaf over .bxsf files in a directory

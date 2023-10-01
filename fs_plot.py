@@ -111,7 +111,7 @@ def read_bxsf(file_name):
     vec_1 = [float(val) for val in vec_1]
 
     #second spanning vector
-    vec_2 = lines[10].split("      ")
+    vec_2 = lines[10].split(" ")
     vec_2 = [val.strip("\n") for val in vec_2]
     vec_2 = [val.strip("\t") for val in vec_2]
     vec_2 = [val for _,val in enumerate(vec_2) if val!='']
@@ -119,7 +119,7 @@ def read_bxsf(file_name):
     vec_2 = [float(val) for val in vec_2]
 
     #thrid spanning vector
-    vec_3 = lines[11].split("      ")
+    vec_3 = lines[11].split(" ")
     vec_3 = [val.strip("\n") for val in vec_3]
     vec_3 = [val.strip("\t") for val in vec_3]
     vec_3 = [val for _,val in enumerate(vec_3) if val!='']

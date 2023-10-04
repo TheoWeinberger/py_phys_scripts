@@ -138,21 +138,25 @@ def read_bxsf(file_name, scale, delta_energy):
 
         #interpolation here
         dimensions_int = [int(scale*dimension) for dimension in dimensions]
-        x_vals_int = np.linspace(0,dimensions_int[0] - scale, dimensions_int[0])
-        y_vals_int = np.linspace(0,dimensions_int[1] - scale, dimensions_int[1])
-        z_vals_int = np.linspace(0,dimensions_int[2] - scale, dimensions_int[2])
-
+        x_vals_int = np.linspace(0,dimensions[0] - 1, dimensions_int[0]-scale+1)
+        y_vals_int = np.linspace(0,dimensions[1] - 1, dimensions_int[1]-scale+1)
+        z_vals_int = np.linspace(0,dimensions[2] - 1, dimensions_int[2]-scale+1)
 
         x_vals_int, y_vals_int, z_vals_int = np.meshgrid(x_vals_int, y_vals_int, z_vals_int)
         out_coords = np.array((x_vals_int.ravel(), y_vals_int.ravel(), z_vals_int.ravel()))
 
         #x_vals_int, y_vals_int, z_vals_int = np.meshgrid(x_vals_int, y_vals_int, z_vals_int)
 
-        out_data = map_coordinates(eig_vals, out_coords/scale, order=3, mode = 'reflect')
+        out_data = map_coordinates(eig_vals, out_coords, order=3, mode = 'reflect')
         
-        out_data = out_data.reshape(dimensions_int[0], dimensions_int[1], dimensions_int[2])
+        out_data = out_data.reshape(dimensions_int[0]- scale + 1, dimensions_int[1]- scale + 1, dimensions_int[2]- scale + 1)
 
-        out_grid_x, out_grid_y, out_grid_z = np.meshgrid(range(-dimensions_int[0]+1, dimensions_int[0]), range(-dimensions_int[1]+1, dimensions_int[1]), range(-dimensions_int[2]+1, dimensions_int[2]))
+        out_grid_x, out_grid_y, out_grid_z = np.meshgrid(range(-dimensions_int[0]+ scale, dimensions_int[0] - scale + 1), range(-dimensions_int[1]+ scale, dimensions_int[1] - scale + 1), range(-dimensions_int[2]+ scale, dimensions_int[2] - scale + 1))
+
+        out_grid_x = out_grid_x/scale
+        out_grid_y = out_grid_y/scale
+        out_grid_z = out_grid_z/scale
+
 
     else:
 
@@ -160,28 +164,28 @@ def read_bxsf(file_name, scale, delta_energy):
         dimensions_int = dimensions
         out_grid_y, out_grid_x, out_grid_z = np.meshgrid(range(-dimensions_int[0]+1, dimensions_int[0]), range(-dimensions_int[1]+1, dimensions_int[1]), range(-dimensions_int[2]+1, dimensions_int[2]))
 
+    
     out_data = np.tile(out_data, (2,2,2))
-
-    out_data = np.delete(out_data,dimensions_int[0], axis=0)
-    out_data = np.delete(out_data,dimensions_int[1], axis=1)
-    out_data = np.delete(out_data,dimensions_int[2], axis=2)
-
+    
+    out_data = np.delete(out_data,dimensions_int[0]-1, axis=0)
+    out_data = np.delete(out_data,dimensions_int[1]-1, axis=1)
+    out_data = np.delete(out_data,dimensions_int[2]-1, axis=2)
 
     x_vals = []
     y_vals = []
     z_vals = []
     
-    k_vectors = np.zeros([2*dimension-1 for dimension in dimensions_int] + [3])
+    k_vectors = np.zeros([2*dimension+1-2*scale for dimension in dimensions_int] + [3])
 
-    k_vectors[:] = (np.outer(out_grid_x+scale/2, vec_1).reshape([2*dimension-1 for dimension in dimensions_int] + [3]) + np.outer(out_grid_y+scale/2,vec_2).reshape([2*dimension-1 for dimension in dimensions_int] + [3]) + np.outer(out_grid_z+scale/2, vec_3).reshape([2*dimension-1 for dimension in dimensions_int] + [3]))/scale
+    k_vectors[:] = (np.outer(out_grid_x, vec_1).reshape([2*dimension+1-2*scale for dimension in dimensions_int] + [3]) + np.outer(out_grid_y,vec_2).reshape([2*dimension+1-2*scale for dimension in dimensions_int] + [3]) + np.outer(out_grid_z, vec_3).reshape([2*dimension+1-2*scale for dimension in dimensions_int] + [3]))
 
-    k_vectors = k_vectors.reshape((2*dimensions_int[0] - 1)*(2*dimensions_int[1]-1)*(2*dimensions_int[2]-1),3)
+    k_vectors = k_vectors.reshape((2*dimensions_int[0]+1-2*scale)*(2*dimensions_int[1]+1-2*scale)*(2*dimensions_int[2]+1-2*scale),3)
     x_vals = k_vectors[:,0]
     y_vals = k_vectors[:,1]
     z_vals = k_vectors[:,2]
 
     grid = pv.StructuredGrid(np.array(x_vals)/dimensions[0], np.array(y_vals)/dimensions[1], np.array(z_vals)/dimensions[2])
-    grid.dimensions = [2*dimensions_int[2] - 1, 2*dimensions_int[1] - 1, 2*dimensions_int[0] - 1]
+    grid.dimensions = [2*dimensions_int[2]+1-2*scale, 2*dimensions_int[1]+1-2*scale, 2*dimensions_int[0]+1-2*scale]
     # generate data grid for computing the values
     #X, Y, Z = np.mgrid[-5:5:18j, -5:5:18j, -5:5:18j]
     #values = X**2 * 0.5 + Y**2 + Z**2 * 2
@@ -253,7 +257,7 @@ parser = argparse.ArgumentParser(description="Fermi Surface Plotter",
                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument("-n", "--name", metavar='\b', type=str, help="Name of the bxsf file in which data is stored", required=True)
-parser.add_argument("-i", "--interpolation-factor", metavar='\b', type=float, default=1, help="Degree of interpolation of Fermi surface")
+parser.add_argument("-i", "--interpolation-factor", metavar='\b', type=int, default=1, help="Degree of interpolation of Fermi surface")
 parser.add_argument("-b", "--bands", metavar='\b', type=str, help="List of bands to include in plot")
 parser.add_argument("-z", "--zoom", metavar='\b', type=float, help="Zoom factor of saved image", default=1.0)
 parser.add_argument("-de", "--delta-energy", metavar='\b', type=float, help="Fermi energy shift for plotting different colors for inner and outer sheets", default=0.000005)
@@ -266,6 +270,8 @@ args = parser.parse_args()
 file_name = args.name
 scale = args.interpolation_factor
 
+#rescale zoom
+args.zoom = args.zoom/scale
 
 #load up bxsf files
 if args.bands is not None:

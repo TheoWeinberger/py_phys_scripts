@@ -431,7 +431,7 @@ def args_parser():
         "-o",
         "--order",
         metavar="\b",
-        type=float,
+        type=int,
         help="Order of spline for interpolation between 1 and 5",
         default=3,
     )
@@ -591,14 +591,14 @@ for file in files:
                     iso,
                     lighting=True,
                     scalars="fermi_velocity",
-                    cmap="jet",
+                    cmap="turbo",
                     opacity=1.0,
                 )
                 plotter.add_mesh(
                     iso,
                     lighting=True,
                     scalars="fermi_velocity",
-                    cmap="jet",
+                    cmap="turbo",
                     opacity=1.0,
                 )
 

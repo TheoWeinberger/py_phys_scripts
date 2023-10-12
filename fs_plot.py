@@ -108,9 +108,7 @@ def read_bxsf_info(file_name):
     return vec_1, vec_2, vec_3, dimensions, band_index, e_f, cell
 
 
-def read_bxsf(
-    file_name, scale, order, shift_energy, fermi_velocity
-):
+def read_bxsf(file_name, scale, order, shift_energy, fermi_velocity):
     """
     Reads .bxsf file and determines two
     matrices, one corresponding to the eigenvalues
@@ -274,7 +272,6 @@ def read_bxsf(
     if fermi_velocity == True:
         grid = grid.compute_derivative(scalars="values")
 
-
     iso1 = grid.contour(
         isosurfaces=1,
         rng=[
@@ -288,9 +285,9 @@ def read_bxsf(
             "ij,ij->i", iso1.point_data["Normals"], iso1["gradient"]
         )
         if scale > 1:
-            iso1.point_data["fermi_velocity"] =  -vf
+            iso1.point_data["fermi_velocity"] = -vf
         else:
-            iso1.point_data["fermi_velocity"] =  vf
+            iso1.point_data["fermi_velocity"] = vf
 
     isos = [iso1]
 
@@ -555,7 +552,13 @@ if opacity > 1 or opacity < 0:
 
 
 # initialise 3D visualisation
-plotter = pv.Plotter(off_screen=True, window_size=[int(round(args.resolution*1024)), int(round(args.resolution*768))])
+plotter = pv.Plotter(
+    off_screen=True,
+    window_size=[
+        int(round(args.resolution * 1024)),
+        int(round(args.resolution * 768)),
+    ],
+)
 
 if args.interactive == True:
     plotter_int = pv.Plotter()
@@ -592,7 +595,13 @@ for file in files:
     vec2 = cell[1] * (dimensions[1] - scale) / dimensions[1]
     vec3 = cell[2] * (dimensions[2] - scale) / dimensions[2]
 
-    plotter_ind = pv.Plotter(off_screen=True, window_size=[int(round(args.resolution*1024)), int(round(args.resolution*768))])
+    plotter_ind = pv.Plotter(
+        off_screen=True,
+        window_size=[
+            int(round(args.resolution * 1024)),
+            int(round(args.resolution * 768)),
+        ],
+    )
 
     for iso in isos:
 
@@ -625,29 +634,28 @@ for file in files:
                         opacity=1.0,
                     )
 
-
             else:
                 plotter.add_mesh(
                     iso,
                     lighting=True,
-                    color=color_list[2*counter],
+                    color=color_list[2 * counter],
                     opacity=args.opacity,
-                    backface_params = {'color':color_list[2*counter+1]}
+                    backface_params={"color": color_list[2 * counter + 1]},
                 )
                 plotter_ind.add_mesh(
                     iso,
                     lighting=True,
-                    color=color_list[2*counter],
+                    color=color_list[2 * counter],
                     opacity=args.opacity,
-                    backface_params = {'color':color_list[2*counter+1]}
+                    backface_params={"color": color_list[2 * counter + 1]},
                 )
                 if args.interactive == True:
                     plotter_int.add_mesh(
                         iso,
                         lighting=True,
-                        color=color_list[2*counter],
+                        color=color_list[2 * counter],
                         opacity=args.opacity,
-                        backface_params = {'color':color_list[2*counter+1]}
+                        backface_params={"color": color_list[2 * counter + 1]},
                     )
 
         except:
@@ -658,7 +666,11 @@ for file in files:
             line = pv.MultipleLines(
                 points=np.array([xx[:, 0], xx[:, 1], xx[:, 2]]).T
             )
-            plotter_ind.add_mesh(line, color="black", line_width = args.resolution*args.line_width)
+            plotter_ind.add_mesh(
+                line,
+                color="black",
+                line_width=args.resolution * args.line_width,
+            )
 
         plotter_ind.set_background("white")
         plotter_ind.camera_position = "yz"
@@ -676,7 +688,9 @@ for file in files:
 # plot BZ
 for xx in e:
     line = pv.MultipleLines(points=np.array([xx[:, 0], xx[:, 1], xx[:, 2]]).T)
-    plotter.add_mesh(line, color="black", line_width=args.resolution*args.line_width)
+    plotter.add_mesh(
+        line, color="black", line_width=args.resolution * args.line_width
+    )
     if args.interactive == True:
         plotter_int.add_mesh(line, color="black", line_width=args.line_width)
 
@@ -701,21 +715,31 @@ if args.interactive == True:
         plotter_int.remove_scalar_bar()
     plotter_int.show()
 
-    camera_coord = np.array([plotter_int.camera.position[0],plotter_int.camera.position[1],plotter_int.camera.position[2]])
+    camera_coord = np.array(
+        [
+            plotter_int.camera.position[0],
+            plotter_int.camera.position[1],
+            plotter_int.camera.position[2],
+        ]
+    )
 
     if plotter_int.camera.position[1] != 0:
-        elevation_rad = np.arctan(plotter_int.camera.position[2]/plotter_int.camera.position[1])
+        elevation_rad = np.arctan(
+            plotter_int.camera.position[2] / plotter_int.camera.position[1]
+        )
         elevation_deg = np.degrees(elevation_rad)
     else:
         elevation_deg = 90
 
     if plotter_int.camera.position[1] != 0:
-        azimuth_rad = np.arctan(plotter_int.camera.position[0]/plotter_int.camera.position[1])
+        azimuth_rad = np.arctan(
+            plotter_int.camera.position[0] / plotter_int.camera.position[1]
+        )
         azimuth_deg = np.degrees(azimuth_rad)
     else:
         azimuth_deg = 90
 
-    zoom = 0.5/np.linalg.norm(camera_coord)
+    zoom = 0.5 / np.linalg.norm(camera_coord)
 
     print("\nFinal Camera coordinates were:")
     print(f"\tAzimuthal angle: {azimuth_deg}")

@@ -137,10 +137,11 @@ def read_bxsf(file_name, scale, order, shift_energy, fermi_velocity):
     # get eerything after band index
     lines_conc = "".join(lines)
     for line in lines:
-        if "BAND" in line and band_index in line:
+        if "BAND:" in line and band_index in line:
             eigen_text = lines_conc.split(line)[1]
             break
     eigen_text = eigen_text.split("END_BANDGRID_3D")[0]
+    eigen_text = re.sub(' +', ' ', eigen_text)
     eigen_vals = eigen_text.split(" ")
     eigen_vals = [val.strip("\n") for val in eigen_vals]
     eigen_vals = eigen_vals[1:-1]

@@ -306,7 +306,7 @@ def read_bxsf(file_name, scale, order, shift_energy, fermi_velocity):
     return k_vectors, eig_vals, e_f, cell, dimensions, isos
 
 
-def get_brillouin_zone_3d(cell, dimensions):
+def get_brillouin_zone_3d(cell):
     """
     Uses the k-space vectors and voronoi analysis to define
     the BZ of the system
@@ -571,11 +571,11 @@ if args.interactive == True:
     plotter_int = pv.Plotter()
 
 # get cell for FS plot
-_, _, _, dimensions, _, _, cell = read_bxsf_info(files[0])
+_, _, _, _, _, _, cell = read_bxsf_info(files[0])
 
 
 # generate BZ from voronoi analysis
-v, e, f = get_brillouin_zone_3d(cell, dimensions)
+v, e, f = get_brillouin_zone_3d(cell)
 
 # triangulate BZ surface
 bz_surf = pv.PolyData(v)

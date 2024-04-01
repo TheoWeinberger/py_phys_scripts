@@ -129,6 +129,10 @@ def read_bxsf(file_name, scale, order, shift_energy, fermi_velocity):
     vec_1, vec_2, vec_3, dimensions, band_index, e_f, cell = read_bxsf_info(
         file_name
     )
+    
+    vec_1 = vec_1*(dimensions[0]+1)/dimensions[0]
+    vec_2 = vec_2*(dimensions[1]+1)/dimensions[1]
+    vec_3 = vec_3*(dimensions[2]+1)/dimensions[2]
 
     """
     Now extract eigenvalues
@@ -319,9 +323,7 @@ def get_brillouin_zone_3d(cell, dimensions):
     """
 
    
-    cell[0] = cell[0]*(dimensions[0]-1)/dimensions[0]
-    cell[1] = cell[1]*(dimensions[1]-1)/dimensions[1]
-    cell[2] = cell[2]*(dimensions[2]-1)/dimensions[2]
+
     px, py, pz = np.tensordot(cell, np.mgrid[-1:2, -1:2, -1:2], axes=[0, 0])
     points = np.c_[px.ravel(), py.ravel(), pz.ravel()]
 

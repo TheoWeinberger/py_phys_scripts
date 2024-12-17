@@ -10,9 +10,9 @@ import os
 import numpy as np
 import scienceplots
 
-plt.style.use(["science"])
+plt.style.use(["nature"])
 
-cp = sns.color_palette("bright")
+cp = sns.color_palette("tab10")
 
 
 def insert(originalfile, string):
@@ -37,6 +37,9 @@ file_name = sys.argv[1]
 # get Ef max shift
 min_shift = float(sys.argv[2])
 max_shift = float(sys.argv[3])
+
+
+
 
 # get Ef shift intervals
 shift_intervals = float(sys.argv[4])
@@ -111,7 +114,7 @@ if shift_intervals > 0:
                 )
 
                 ax1.scatter(
-                    data["Phi(deg)"], data["Freq(kT)"], label=band_name, s=10
+                    data["Phi(deg)"], data["Freq(kT)"], label=band_name, s=3
                 )
                 ax1.set_ylabel("Frequency (kT)")
                 ax1.set_xlabel("c-a angle")
@@ -153,7 +156,8 @@ else:
 
     Ef = 0
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    figphi, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
+    figtheta, (ax3, ax4) = plt.subplots(1, 2, sharey=True)
 
     for file in files:
         # generate config file for ca
@@ -207,11 +211,17 @@ else:
             )
 
             ax1.scatter(
-                data["Phi(deg)"], data["Freq(kT)"], label=band_name, s=10
+                data["Phi(deg)"], data["Freq(kT)"], label=band_name, s=3
             )
             ax1.set_ylabel("Frequency (kT)")
             ax1.set_xlabel("c-a angle")
             # ax1.legend()
+
+            ax3.scatter(
+                data["Theta(deg)"], data["Freq(kT)"], label=band_name, s=3
+            )
+            ax3.set_ylabel("Frequency (kT)")
+            ax3.set_xlabel("c-a angle")
 
             insert("config_cb.in", Ef)
             insert2("config_temp.in", file)
@@ -229,9 +239,23 @@ else:
             )
 
             ax2.scatter(
-                data["Phi(deg)"], data["Freq(kT)"], label=band_name, s=10
+                data["Phi(deg)"], data["Freq(kT)"], label=band_name, s=3
             )
             ax2.set_xlabel("c-b angle")
-            ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+            ax2.legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon=False)
+            ax4.scatter(
+                data["Theta(deg)"], data["Freq(kT)"], label=band_name, s=3
+            )
+            ax4.set_xlabel("c-b angle")
+            ax4.legend(loc="center left", bbox_to_anchor=(1, 0.5), frameon=False)
+            ax1.tick_params('both', which='both', direction='in',
+                bottom=True, top=True, left=True, right=True)
+            ax2.tick_params('both', which='both', direction='in',
+                            bottom=True, top=True, left=True, right=True)
+            ax3.tick_params('both', which='both', direction='in',
+                bottom=True, top=True, left=True, right=True)
+            ax4.tick_params('both', which='both', direction='in',
+                            bottom=True, top=True, left=True, right=True)
 
-    plt.savefig(file_name + "_" + Ef.strip() + ".png", format="png", dpi=1200)
+    figphi.savefig(file_name + "_" + Ef.strip() + "_phi.pdf", format="pdf", dpi=1200,  bbox_inches="tight")
+    figtheta.savefig(file_name + "_" + Ef.strip() + "_theta.pdf", format="pdf", dpi=1200, bbox_inches="tight")
